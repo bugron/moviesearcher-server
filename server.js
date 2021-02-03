@@ -8,6 +8,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Make sure the server accepts CORS requests
+// Since the client will be running on another port/host
 app.use(cors());
 
 app.use(routes);
