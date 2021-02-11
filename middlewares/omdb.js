@@ -8,6 +8,7 @@ client.on('error', function(error) {
 
 const omdbMiddleware = (req, res, next) => {
   const RESULTS_PER_PAGE = 10; // OMDb gives 10 items per page
+  const KEY_EXPIRE_TIME = 3600 * 12; // Expire cached items in 12 hours
   const { t, y = '', type = '', page = 1 } = req.query;
   // Create a key based on the request to cache search results
   const requestKey = `title:${t}-year:${y}-type:${type}-page:${page}`;
@@ -33,6 +34,8 @@ const omdbMiddleware = (req, res, next) => {
           // And finally cache the results
           client.set(requestKey, JSON.stringify(searchData), (err) => {
             if (err) throw err;
+            // Set cached items to expire
+            client.expire(requestKey, KEY_EXPIRE_TIME);
             // And return the data to the client
             res.json(searchData);
           })
